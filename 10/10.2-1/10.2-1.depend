@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1683068970 source:c:\kuliah\code blocks\semester 2\minggu 10\10.2-1\main.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
