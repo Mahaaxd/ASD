@@ -272,7 +272,7 @@ void print(int x[])
     {
         printf("%d ", x[i]);
     }
-    printf("\nWaktu : %hhd", t2-t1);
+    printf("\nWaktu : %ld", t2-t1);
 }
 
 void tukar(int *a, int *b)
