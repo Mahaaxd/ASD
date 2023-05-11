@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#define MAX 30
+#define MAX 10
 
 struct siswa
 {
@@ -21,6 +21,10 @@ void insSort(struct siswa [], int, int);
 void selSort(struct siswa [], int, int);
 void bubSort(struct siswa [], int, int);
 void sheSort(struct siswa [], int, int);
+void merSort(int, int, struct siswa [], int, int);
+void merge(int, int, int, struct siswa [],int, int);
+void quiSort(int, int, struct siswa [], int, int);
+int partisi(int, int, struct siswa [], int, int);
 void tukar(struct siswa *, struct siswa *);
 //FUNGSI MENU
 void menu();
@@ -34,43 +38,6 @@ int main()
     return 0;
 }
 
-void inisial(struct siswa data[])
-{
-    puts("\nMEMASUKKAN DATA");
-    for(int i = 0; i < n; i++)
-    {
-        printf("Siswa ke-%d\n",i+1);
-        printf("No\t: ");
-        scanf("%d",&data[i].no);
-        fflush(stdin);
-        printf("Nama\t: ");
-        gets(data[i].nama);
-        fflush(stdin);
-        printf("Nilai\t: ");
-        scanf(" %hhd",&data[i].nilai);
-        fflush(stdin);
-    }
-}
-
-int modeUrut()
-{
-    int pilih;
-    puts("\nPengurutan berdasarkan\n1. No\n2. Nama\n3. Nilai");
-    printf("Masukkan pilihan : ");
-    scanf("%d",&pilih);
-    return pilih;
-}
-
-int urut()
-{
-    int pilih;
-    puts("\nJENIS SORT\n1. ASCENDING\n2. DESCENDING");
-    printf("Masukkan pilihan : ");
-    scanf("%d",&pilih);
-    return pilih;
-}
-
-
 void menu()
 {
     int pilih, sort, mode;
@@ -82,10 +49,11 @@ void menu()
     do
     {
         puts("\n\nMENU METODE SORTING");
-        printf("1. Insertion Sort\n2. Selection Sort\n3. Bubble Sort\n4. Shell Sort\n5. Keluar");
+        printf("1. Insertion Sort\n2. Selection Sort\n3. Bubble Sort\n4. Shell Sort\n5. Merge Sort\n6. Quick Sort\n7. Keluar");
         printf("\nMasukkan pilihan anda : ");
         scanf("%d",&pilih);
-        if(pilih < 5){
+        if(pilih < 7)
+        {
             sort = urut();
             mode = modeUrut();
         }
@@ -116,15 +84,66 @@ void menu()
             tampil(data);
             break;
         case 5:
+            time(&t1);
+            merSort(0, n-1, data, sort, mode);
+            time(&t2);
+            tampil(data);
+            break;
+        case 6:
+            time(&t1);
+            quiSort(0, n-1, data, sort, mode);
+            time(&t2);
+            tampil(data);
+            break;
+        case 7:
             exit(0);
         default:
             puts("Pilihan salah");
             break;
         }
     }
-    while(pilih != 5);
+    while(pilih != 7);
 
 }
+
+void inisial(struct siswa data[])
+{
+    puts("\nMEMASUKKAN DATA");
+    for(int i = 0; i < n; i++)
+    {
+        printf("Siswa ke-%d\n",i+1);
+        printf("No\t: ");
+        scanf("%d",&data[i].no);
+        fflush(stdin);
+        printf("Nama\t: ");
+        scanf(" %[^\n]%*c", data[i].nama);
+        fflush(stdin);
+        printf("Nilai\t: ");
+        scanf(" %hhd",&data[i].nilai);
+        fflush(stdin);
+    }
+}
+
+int modeUrut()
+{
+    int pilih;
+    puts("\nPengurutan berdasarkan\n1. No\n2. Nama\n3. Nilai");
+    printf("Masukkan pilihan : ");
+    scanf("%d",&pilih);
+    return pilih;
+}
+
+int urut()
+{
+    int pilih;
+    puts("\nJENIS SORT\n1. ASCENDING\n2. DESCENDING");
+    printf("Masukkan pilihan : ");
+    scanf("%d",&pilih);
+    return pilih;
+}
+
+
+
 
 void insSort(struct siswa data[], int kondisi, int mode)
 {
@@ -281,6 +300,158 @@ void sheSort(struct siswa data[], int kondisi, int mode)
             }
         }
     }
+}
+
+void merSort(int l, int r, struct siswa data[],int sort, int mode)
+{
+    int m;
+
+    if(l < r)
+    {
+        m = (l+r) / 2;
+        merSort(l, m, data, sort, mode);
+        merSort(m+1, r, data, sort, mode);
+        merge(l, m, r, data, sort, mode);
+    }
+}
+
+void merge(int l, int m, int r, struct siswa data[],int sort, int mode)
+{
+    int kiri1, kiri2, kanan1, kanan2, i, j;
+    struct siswa temp[n];
+
+    kiri1 = l;
+    kanan1 = m;
+    kiri2 = m+1;
+    kanan2 = r;
+    i = l;
+    j = l;
+
+    while(kiri1 <= kanan1 && kiri2 <= kanan2)
+    {
+        switch(mode)
+        {
+        case 1://no
+            if(sort == 1 && (data[kiri1].no < data[kiri2].no) || sort == 2 && (data[kiri1].no > data[kiri2].no))
+            {
+                temp[i] = data[kiri1];
+                kiri1++;
+            }
+            else
+            {
+                temp[i] = data[kiri2];
+                kiri2++;
+            }
+            break;
+        case 2://nama
+            if((sort == 1 && (strcmp(data[kiri1].nama, data[kiri2].nama) < 0)) || (sort == 2 && (strcmp(data[kiri1].nama, data[kiri2].nama) > 0)))
+            {
+                temp[i] = data[kiri1];
+                kiri1++;
+            }
+            else
+            {
+                temp[i] = data[kiri2];
+                kiri2++;
+            }
+            break;
+        case 3://nilai
+            if((sort == 1 && (data[kiri1].nilai < data[kiri2].nilai)) || (sort == 2 && (data[kiri1].nilai > data[kiri2].nilai)))
+            {
+                temp[i] = data[kiri1];
+                kiri1++;
+            }
+            else
+            {
+                temp[i] = data[kiri2];
+                kiri2++;
+            }
+            break;
+        }
+        i++;
+    }
+
+    while(kiri1 <= kanan1)
+    {
+        temp[i] = data[kiri1];
+        i++;
+        kiri1++;
+    }
+
+    while(kiri2 <= kanan2)
+    {
+        temp[i] = data[kiri2];
+        i++;
+        kiri2++;
+    }
+
+    while(j <= r)
+    {
+        data[j] = temp[j];
+        j++;
+    }
+}
+
+void quiSort(int p, int r, struct siswa data[], int sort, int mode)
+{
+    int q;
+
+    if(p < r)
+    {
+        q = partisi(p, r, data, sort, mode);
+        quiSort(p, q, data, sort, mode);
+        quiSort(q+1, r, data, sort, mode);
+    }
+}
+
+int partisi(int p, int r, struct siswa data[], int sort, int mode)
+{
+    int i, j;
+    struct siswa pivot;
+
+    pivot = data[p];
+    strcpy(pivot.nama, data[p].nama);
+
+    i = p;
+    j = r;
+
+    while(i < j)
+    {
+        switch(mode)
+        {
+        case 1://no
+            while(sort == 1 ? data[j].no > pivot.no : data[j].no < pivot.no)
+                j--;
+            while(sort == 1 ? data[i].no < pivot.no : data[i].no > pivot.no)
+                i++;
+            break;
+        case 2://nama
+            while(sort == 1 ? strcmp(data[j].nama, pivot.nama) > 0 : strcmp(data[j].nama, pivot.nama) < 0)
+                j--;
+            while(sort == 1 ? strcmp(data[i].nama, pivot.nama) < 0 : strcmp(data[i].nama, pivot.nama) > 0)
+                i++;
+            break;
+        case 3://nilai
+            while(sort == 1 ? data[j].nilai > pivot.nilai : data[j].nilai < pivot.nilai)
+                j--;
+            while(sort == 1 ? data[i].nilai < pivot.nilai : data[i].nilai > pivot.nilai)
+                i++;
+            break;
+        default:
+            break;
+        }
+
+
+        if(i < j)
+        {
+            tukar(&data[i], &data[j]);
+            j--;
+            i++;
+        }
+        else
+            return j;
+    }
+    return j;
 }
 
 void tukar(struct siswa *a, struct siswa *b)
